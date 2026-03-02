@@ -597,91 +597,6 @@ body.home-page .hero {
     margin-bottom: 12px;
 }
 
-@media (max-width: 700px) {
-    nav {
-        gap: 16px;
-        padding: 10px 20px;
-        top: 8px;
-        width: calc(100% - 24px);
-    }
-
-    nav .brand {
-        font-size: 15px;
-    }
-
-    nav a {
-        font-size: 13px;
-    }
-
-    .hero {
-        padding: 24px 16px;
-    }
-
-    .hero h1 {
-        font-size: 28px;
-    }
-
-    .hero p.subtitle {
-        font-size: 15px;
-    }
-
-    .hero .avatar {
-        width: 130px;
-        height: 130px;
-    }
-
-    .contact-bar {
-        flex-direction: column;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .cta-links {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .learn-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .work-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .work-grid .learn-card {
-        padding: 24px 20px;
-    }
-
-    .work-grid .learn-card-icon {
-        font-size: 32px;
-        margin-bottom: 12px;
-    }
-
-    .work-grid .learn-card-title {
-        font-size: 20px;
-        margin-bottom: 6px;
-    }
-
-    .work-grid .learn-card-school {
-        font-size: 13px;
-        margin-bottom: 16px;
-    }
-
-    .work-grid .learn-card-list li {
-        font-size: 14px;
-        padding: 7px 0;
-    }
-
-    .container {
-        margin: 24px auto;
-        padding: 0 16px;
-    }
-
-    body.werk-page .container {
-        padding: 0 16px;
-    }
-}
 
 .learn-card {
     --card-color: #4F46E5;
@@ -919,4 +834,94 @@ body.home-page .hero {
     font-size: 13px;
     color: #e94560;
     font-weight: 600;
+}
+
+/* =====================
+   Mobiel
+   ===================== */
+
+@media (max-width: 700px) {
+    nav {
+        gap: 16px;
+        padding: 10px 20px;
+        top: 8px;
+        width: calc(100% - 24px);
+    }
+
+    nav .brand {
+        font-size: 15px;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    .hero {
+        padding: 24px 16px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .hero p.subtitle {
+        font-size: 15px;
+    }
+
+    .hero .avatar {
+        width: 130px;
+        height: 130px;
+    }
+
+    .contact-bar {
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .cta-links {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .learn-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .work-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .work-grid .learn-card {
+        padding: 24px 20px;
+    }
+
+    .work-grid .learn-card-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .work-grid .learn-card-title {
+        font-size: 20px;
+        margin-bottom: 6px;
+    }
+
+    .work-grid .learn-card-school {
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+
+    .work-grid .learn-card-list li {
+        font-size: 14px;
+        padding: 7px 0;
+    }
+
+    .container {
+        margin: 24px auto;
+        padding: 0 16px;
+    }
+
+    body.werk-page .container {
+        padding: 0 16px;
+    }
 }
