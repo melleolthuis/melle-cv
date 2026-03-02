@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Opleiding – Melle Olthuis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="edu-page">
+
+    <canvas id="dot-canvas"></canvas>
+
+    <nav>
+        <span class="brand">Melle Olthuis</span>
+        <a href="home.html">Home</a>
+        <a href="werkervaring.html">Werkervaring</a>
+        <a href="opleiding.html" class="active">Opleiding</a>
+    </nav>
+
+    <div class="container">
+
+        <div class="section-title">Huidige opleiding</div>
+
+        <div class="current-edu-card">
+            <div class="current-edu-top">
+                <div class="current-edu-icon">🎓</div>
+                <span class="current-edu-badge">Bezig</span>
+            </div>
+            <h2 class="current-edu-title">Software Developer</h2>
+            <p class="current-edu-level">MBO Niveau 4</p>
+            <p class="current-edu-school">ROC van Amsterdam · Hilversum · sep 2023 – heden</p>
+            <div class="current-edu-divider"></div>
+            <p class="current-edu-desc">
+                Gericht op programmeren en werken met computers. Ervaring opgedaan met HTML, CSS, Python en Java.
+                Certificaat Digitale Vaardigheden (gevorderd) behaald.
+            </p>
+        </div>
+
+        <div class="section-title">Middelbare school</div>
+
+        <div class="past-edu-card">
+            <div class="past-edu-left">
+                <div class="past-edu-icon">📚</div>
+                <div>
+                    <h3 class="past-edu-title">VMBO</h3>
+                    <p class="past-edu-school">Werkplaats · Bilthoven · 2017 – 2021</p>
+                </div>
+            </div>
+            <span class="past-edu-badge">Afgerond</span>
+            <p class="past-edu-desc">
+                VMBO afgerond. In 2022 nog een jaar HAVO gevolgd maar niet afgerond.
+            </p>
+        </div>
+
+        <div class="section-title">Wat ik heb geleerd</div>
+
+        <div class="learn-grid">
+
+            <div class="learn-card" style="--card-color: #4F46E5;">
+                <div class="learn-card-icon">💻</div>
+                <h3 class="learn-card-title">Programmeren</h3>
+                <p class="learn-card-school">ROC van Amsterdam · 2023 – heden</p>
+                <ul class="learn-card-list">
+                    <li>Python</li>
+                    <li>Java</li>
+                    <li>HTML</li>
+                    <li>CSS</li>
+                </ul>
+            </div>
+
+            <div class="learn-card" style="--card-color: #10B981;">
+                <div class="learn-card-icon">🌐</div>
+                <h3 class="learn-card-title">Website Development</h3>
+                <p class="learn-card-school">ROC van Amsterdam · 2023 – heden</p>
+                <ul class="learn-card-list">
+                    <li>Websites bouwen</li>
+                    <li>Websites bewerken</li>
+                    <li>Front-end ontwikkeling</li>
+                </ul>
+            </div>
+
+            <div class="learn-card" style="--card-color: #F59E0B;">
+                <div class="learn-card-icon">🖥️</div>
+                <h3 class="learn-card-title">ICT & Software Development</h3>
+                <p class="learn-card-school">ROC van Amsterdam · 2023 – heden</p>
+                <ul class="learn-card-list">
+                    <li>Software Development</li>
+                    <li>ICT-toepassingen</li>
+                    <li>Probleemoplossend denken</li>
+                </ul>
+            </div>
+
+            <div class="learn-card" style="--card-color: #EF4444;">
+                <div class="learn-card-icon">📊</div>
+                <h3 class="learn-card-title">Microsoft Office</h3>
+                <p class="learn-card-school">Digitale Vaardigheden · Gevorderd</p>
+                <ul class="learn-card-list">
+                    <li>Microsoft Word (gevorderd)</li>
+                    <li>Microsoft Excel (gevorderd)</li>
+                </ul>
+            </div>
+
+            <div class="learn-card" style="--card-color: #8B5CF6;">
+                <div class="learn-card-icon">🌍</div>
+                <h3 class="learn-card-title">Talen</h3>
+                <p class="learn-card-school">Middelbare school & MBO</p>
+                <ul class="learn-card-list">
+                    <li>Nederlands</li>
+                    <li>Engels</li>
+                </ul>
+            </div>
+
+            <div class="learn-card" style="--card-color: #06B6D4;">
+                <div class="learn-card-icon">🤝</div>
+                <h3 class="learn-card-title">Soft Skills</h3>
+                <p class="learn-card-school">Werk & Opleiding</p>
+                <ul class="learn-card-list">
+                    <li>Teamspeler</li>
+                    <li>Zelfstandig werken</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+    (function () {
+        const canvas = document.getElementById('dot-canvas');
+        const ctx = canvas.getContext('2d');
+        const CFG = { dotSize: 5, gap: 15, proximity: 120, speedTrigger: 80, shockRadius: 250, shockStrength: 5, springK: 180, damping: 12 };
+        const BASE   = { r: 39, g: 30, b: 55 };
+        const ACTIVE = { r: 82, g: 39, b: 255 };
+        let dots = [], pointer = { x: -9999, y: -9999, vx: 0, vy: 0, speed: 0, lastTime: 0, lastX: 0, lastY: 0 }, lastFrame = performance.now();
+        function buildGrid() {
+            const dpr = window.devicePixelRatio || 1, W = window.innerWidth, H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const cell = CFG.dotSize + CFG.gap, cols = Math.ceil(W / cell) + 1, rows = Math.ceil(H / cell) + 1;
+            const startX = (W % cell) / 2 + CFG.dotSize / 2, startY = (H % cell) / 2 + CFG.dotSize / 2;
+            dots = [];
+            for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+                dots.push({ cx: startX + c * cell, cy: startY + r * cell, xOffset: 0, yOffset: 0, vx: 0, vy: 0 });
+        }
+        function draw(now) {
+            const dt = Math.min((now - lastFrame) / 1000, 0.05); lastFrame = now;
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            const proxSq = CFG.proximity * CFG.proximity;
+            for (const dot of dots) {
+                if (dot.xOffset || dot.yOffset || dot.vx || dot.vy) {
+                    dot.vx += (-CFG.springK * dot.xOffset - CFG.damping * dot.vx) * dt;
+                    dot.vy += (-CFG.springK * dot.yOffset - CFG.damping * dot.vy) * dt;
+                    dot.xOffset += dot.vx * dt; dot.yOffset += dot.vy * dt;
+                    if (Math.abs(dot.xOffset) < 0.05 && Math.abs(dot.yOffset) < 0.05 && Math.abs(dot.vx) < 0.05 && Math.abs(dot.vy) < 0.05)
+                        dot.xOffset = dot.yOffset = dot.vx = dot.vy = 0;
+                }
+                const ox = dot.cx + dot.xOffset, oy = dot.cy + dot.yOffset;
+                const dx = dot.cx - pointer.x, dy = dot.cy - pointer.y, dsq = dx * dx + dy * dy;
+                let fillStyle;
+                if (dsq <= proxSq) {
+                    const t = 1 - Math.sqrt(dsq) / CFG.proximity;
+                    fillStyle = `rgb(${Math.round(BASE.r+(ACTIVE.r-BASE.r)*t)},${Math.round(BASE.g+(ACTIVE.g-BASE.g)*t)},${Math.round(BASE.b+(ACTIVE.b-BASE.b)*t)})`;
+                } else { fillStyle = `rgb(${BASE.r},${BASE.g},${BASE.b})`; }
+                ctx.beginPath(); ctx.arc(ox, oy, CFG.dotSize / 2, 0, Math.PI * 2);
+                ctx.fillStyle = fillStyle; ctx.fill();
+            }
+            requestAnimationFrame(draw);
+        }
+        buildGrid(); requestAnimationFrame(draw);
+        function throttle(fn, ms) { let last = 0; return function(...args) { const now = performance.now(); if (now - last >= ms) { last = now; fn.apply(this, args); } }; }
+        window.addEventListener('mousemove', throttle(function(e) {
+            const now = performance.now(), pr = pointer, dt = pr.lastTime ? now - pr.lastTime : 16;
+            const dx = e.clientX - pr.lastX, dy = e.clientY - pr.lastY;
+            let vx = dx / dt * 1000, vy = dy / dt * 1000, speed = Math.hypot(vx, vy);
+            if (speed > 5000) { const s = 5000 / speed; vx *= s; vy *= s; speed = 5000; }
+            pr.lastTime = now; pr.lastX = e.clientX; pr.lastY = e.clientY;
+            pr.vx = vx; pr.vy = vy; pr.speed = speed; pr.x = e.clientX; pr.y = e.clientY;
+            if (speed > CFG.speedTrigger) {
+                for (const dot of dots) {
+                    const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
+                    if (dist < CFG.proximity) {
+                        const angle = Math.atan2(dot.cy - pr.y, dot.cx - pr.x), force = (1 - dist / CFG.proximity) * speed * 0.003;
+                        dot.vx += Math.cos(angle) * force; dot.vy += Math.sin(angle) * force;
+                    }
+                }
+            }
+        }, 16), { passive: true });
+        window.addEventListener('click', function(e) {
+            for (const dot of dots) {
+                const dist = Math.hypot(dot.cx - e.clientX, dot.cy - e.clientY);
+                if (dist < CFG.shockRadius) {
+                    const falloff = 1 - dist / CFG.shockRadius, angle = Math.atan2(dot.cy - e.clientY, dot.cx - e.clientX);
+                    dot.vx += Math.cos(angle) * CFG.shockStrength * falloff * 300;
+                    dot.vy += Math.sin(angle) * CFG.shockStrength * falloff * 300;
+                }
+            }
+        });
+        window.addEventListener('resize', buildGrid);
+    })();
+
+        document.querySelectorAll('.learn-card, .current-edu-card, .past-edu-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+                card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+            });
+        });
+    </script>
+
+</body>
+</html>

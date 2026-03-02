@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Werkervaring – Melle Olthuis</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
+            integrity="sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O"
+            crossorigin="anonymous"></script>
+</head>
+<body class="werk-page">
+
+    <div id="silk-bg"></div>
+
+    <nav>
+        <span class="brand">Melle Olthuis</span>
+        <a href="home.html">Home</a>
+        <a href="werkervaring.html" class="active">Werkervaring</a>
+        <a href="opleiding.html">Opleiding</a>
+    </nav>
+
+    <div class="container">
+
+        <div class="work-grid">
+
+            <div class="learn-card" style="--card-color: #4F46E5;">
+                <div class="learn-card-icon">👨‍🍳</div>
+                <h3 class="learn-card-title">Kok</h3>
+                <p class="learn-card-school">De Kastanjehof · jul 2024 – mrt 2025</p>
+                <ul class="learn-card-list">
+                    <li>Ontwikkelen van kookvaardigheden</li>
+                    <li>Keukenbeheer</li>
+                    <li>Smaakcombinaties toepassen</li>
+                    <li>Efficiënt werken in professionele keuken</li>
+                </ul>
+            </div>
+
+            <div class="learn-card" style="--card-color: #10B981;">
+                <div class="learn-card-icon">🔥</div>
+                <h3 class="learn-card-title">Kok / Hulpkok</h3>
+                <p class="learn-card-school">Buiten in de Kuil · apr 2022 – jul 2023</p>
+                <ul class="learn-card-list">
+                    <li>Zelfstandig werken in de keuken</li>
+                    <li>BBQ concept groepen draaien</li>
+                    <li>Keukenondersteuning en voorbereiding</li>
+                </ul>
+            </div>
+
+            <div class="learn-card" style="--card-color: #F59E0B;">
+                <div class="learn-card-icon">🍹</div>
+                <h3 class="learn-card-title">Bediening / Barman</h3>
+                <p class="learn-card-school">De Bosrand · 2019 – 2022</p>
+                <ul class="learn-card-list">
+                    <li>Bediening</li>
+                    <li>Barwerkzaamheden</li>
+                    <li>Gastcontact</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+    (function () {
+        const container = document.getElementById('silk-bg');
+
+        function hexToRGB(hex) {
+            hex = hex.replace('#', '');
+            return [
+                parseInt(hex.slice(0, 2), 16) / 255,
+                parseInt(hex.slice(2, 4), 16) / 255,
+                parseInt(hex.slice(4, 6), 16) / 255
+            ];
+        }
+
+        const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        const scene  = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+        const rgb = hexToRGB('#5227FF');
+        const uniforms = {
+            uTime:           { value: 0 },
+            uSpeed:          { value: 5 },
+            uScale:          { value: 1 },
+            uNoiseIntensity: { value: 1.5 },
+            uColor:          { value: new THREE.Color(rgb[0], rgb[1], rgb[2]) },
+            uRotation:       { value: 0 }
+        };
+
+        const vertexShader = `
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            void main() {
+                vPosition = position;
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            varying vec2 vUv;
+            varying vec3 vPosition;
+
+            uniform float uTime;
+            uniform vec3  uColor;
+            uniform float uSpeed;
+            uniform float uScale;
+            uniform float uRotation;
+            uniform float uNoiseIntensity;
+
+            const float e = 2.71828182845904523536;
+
+            float noise(vec2 texCoord) {
+                float G = e;
+                vec2  r = (G * sin(G * texCoord));
+                return fract(r.x * r.y * (1.0 + texCoord.x));
+            }
+
+            vec2 rotateUvs(vec2 uv, float angle) {
+                float c = cos(angle);
+                float s = sin(angle);
+                mat2  rot = mat2(c, -s, s, c);
+                return rot * uv;
+            }
+
+            void main() {
+                float rnd     = noise(gl_FragCoord.xy);
+                vec2  uv      = rotateUvs(vUv * uScale, uRotation);
+                vec2  tex     = uv * uScale;
+                float tOffset = uSpeed * uTime;
+
+                tex.y += 0.03 * sin(8.0 * tex.x - tOffset);
+
+                float pattern = 0.6 +
+                    0.4 * sin(5.0 * (tex.x + tex.y +
+                        cos(3.0 * tex.x + 5.0 * tex.y) +
+                        0.02 * tOffset) +
+                        sin(20.0 * (tex.x + tex.y - 0.1 * tOffset)));
+
+                vec4 col = vec4(uColor, 1.0) * vec4(pattern) - rnd / 15.0 * uNoiseIntensity;
+                col.a = 1.0;
+                gl_FragColor = col;
+            }
+        `;
+
+        const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });
+        scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+        let lastTime = performance.now();
+        function animate(now) {
+            requestAnimationFrame(animate);
+            const delta = Math.min((now - lastTime) / 1000, 0.05);
+            lastTime = now;
+            uniforms.uTime.value += 0.1 * delta;
+            renderer.render(scene, camera);
+        }
+        requestAnimationFrame(animate);
+
+        window.addEventListener('resize', function () {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    })();
+
+    document.querySelectorAll('.learn-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+            card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+        });
+    });
+    </script>
+
+</body>
+</html>

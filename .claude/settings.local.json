@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import sys,json; data=json.loads\\(sys.stdin.read\\(\\)\\); print\\(data.get\\(''type'',''''\\), data.get\\(''role'',''''\\), str\\(data\\)[:200]\\)\")",
+      "Bash(node -e \":*)",
+      "Bash(powershell -Command \":*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Melle/AppData/Local/Temp/check_structure.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Melle/AppData/Local/Temp/extract2.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Melle/AppData/Local/Temp/find_reads.ps1\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Melle\\AppData\\Local\\Temp"
+    ]
+  }
+}
