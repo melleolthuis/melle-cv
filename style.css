@@ -16,8 +16,7 @@ body {
 
 body.home-page {
     background: #0d0b14;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -110,7 +109,8 @@ nav {
     top: 16px;
     z-index: 100;
     margin: 16px auto 0;
-    width: 1200px;
+    max-width: 1200px;
+    width: calc(100% - 32px);
     justify-content: space-between;
     border-radius: 999px;
     box-shadow: 0 4px 24px rgba(82, 39, 255, 0.25);
@@ -596,8 +596,71 @@ body.home-page .hero {
 }
 
 @media (max-width: 700px) {
+    nav {
+        gap: 16px;
+        padding: 10px 20px;
+        top: 8px;
+        width: calc(100% - 24px);
+    }
+
+    nav .brand {
+        font-size: 15px;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    .hero {
+        padding: 24px 16px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .hero p.subtitle {
+        font-size: 15px;
+    }
+
+    .hero .avatar {
+        width: 130px;
+        height: 130px;
+    }
+
+    .contact-bar {
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .cta-links {
+        flex-direction: column;
+        align-items: center;
+    }
+
     .learn-grid {
         grid-template-columns: 1fr;
+    }
+
+    .work-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .work-grid .learn-card {
+        padding: 28px 24px;
+    }
+
+    .work-grid .learn-card-icon {
+        font-size: 36px;
+    }
+
+    .work-grid .learn-card-title {
+        font-size: 20px;
+    }
+
+    .container {
+        margin: 24px auto;
     }
 }
 
