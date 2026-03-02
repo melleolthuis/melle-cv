@@ -679,6 +679,11 @@ body.home-page .hero {
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
     margin-bottom: 12px;
+    min-width: 0;
+}
+
+.work-grid .learn-card {
+    min-width: 0;
 }
 
 .work-grid .learn-card {
@@ -840,7 +845,7 @@ body.home-page .hero {
    Mobiel
    ===================== */
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
     nav {
         gap: 16px;
         padding: 10px 20px;
