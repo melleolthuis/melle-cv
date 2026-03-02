@@ -922,11 +922,12 @@ body.home-page .hero {
     }
 
     .container {
-        margin: 24px auto;
+        margin: 32px auto;
         padding: 0 16px;
     }
 
     body.werk-page .container {
         padding: 0 16px;
+        margin-top: 32px;
     }
 }
