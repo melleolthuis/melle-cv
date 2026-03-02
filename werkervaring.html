@@ -6,13 +6,10 @@
     <meta name="referrer" content="no-referrer">
     <title>Werkervaring – Melle Olthuis</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
-            integrity="sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O"
-            crossorigin="anonymous"></script>
 </head>
 <body class="werk-page">
 
-    <div id="silk-bg"></div>
+    <canvas id="dot-canvas"></canvas>
 
     <nav>
         <span class="brand">Melle Olthuis</span>
@@ -66,107 +63,77 @@
 
     <script>
     (function () {
-        const container = document.getElementById('silk-bg');
-
-        function hexToRGB(hex) {
-            hex = hex.replace('#', '');
-            return [
-                parseInt(hex.slice(0, 2), 16) / 255,
-                parseInt(hex.slice(2, 4), 16) / 255,
-                parseInt(hex.slice(4, 6), 16) / 255
-            ];
+        const canvas = document.getElementById('dot-canvas');
+        const ctx = canvas.getContext('2d');
+        const CFG = { dotSize: 5, gap: 15, proximity: 120, speedTrigger: 80, shockRadius: 250, shockStrength: 5, springK: 180, damping: 12 };
+        const BASE   = { r: 39, g: 30, b: 55 };
+        const ACTIVE = { r: 82, g: 39, b: 255 };
+        let dots = [], pointer = { x: -9999, y: -9999, vx: 0, vy: 0, speed: 0, lastTime: 0, lastX: 0, lastY: 0 }, lastFrame = performance.now();
+        function buildGrid() {
+            const dpr = window.devicePixelRatio || 1, W = window.innerWidth, H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const cell = CFG.dotSize + CFG.gap, cols = Math.ceil(W / cell) + 1, rows = Math.ceil(H / cell) + 1;
+            const startX = (W % cell) / 2 + CFG.dotSize / 2, startY = (H % cell) / 2 + CFG.dotSize / 2;
+            dots = [];
+            for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+                dots.push({ cx: startX + c * cell, cy: startY + r * cell, xOffset: 0, yOffset: 0, vx: 0, vy: 0 });
         }
-
-        const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
-
-        const scene  = new THREE.Scene();
-        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-        const rgb = hexToRGB('#5227FF');
-        const uniforms = {
-            uTime:           { value: 0 },
-            uSpeed:          { value: 5 },
-            uScale:          { value: 1 },
-            uNoiseIntensity: { value: 1.5 },
-            uColor:          { value: new THREE.Color(rgb[0], rgb[1], rgb[2]) },
-            uRotation:       { value: 0 }
-        };
-
-        const vertexShader = `
-            varying vec2 vUv;
-            varying vec3 vPosition;
-            void main() {
-                vPosition = position;
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        function draw(now) {
+            const dt = Math.min((now - lastFrame) / 1000, 0.05); lastFrame = now;
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            const proxSq = CFG.proximity * CFG.proximity;
+            for (const dot of dots) {
+                if (dot.xOffset || dot.yOffset || dot.vx || dot.vy) {
+                    dot.vx += (-CFG.springK * dot.xOffset - CFG.damping * dot.vx) * dt;
+                    dot.vy += (-CFG.springK * dot.yOffset - CFG.damping * dot.vy) * dt;
+                    dot.xOffset += dot.vx * dt; dot.yOffset += dot.vy * dt;
+                    if (Math.abs(dot.xOffset) < 0.05 && Math.abs(dot.yOffset) < 0.05 && Math.abs(dot.vx) < 0.05 && Math.abs(dot.vy) < 0.05)
+                        dot.xOffset = dot.yOffset = dot.vx = dot.vy = 0;
+                }
+                const ox = dot.cx + dot.xOffset, oy = dot.cy + dot.yOffset;
+                const dx = dot.cx - pointer.x, dy = dot.cy - pointer.y, dsq = dx * dx + dy * dy;
+                let fillStyle;
+                if (dsq <= proxSq) {
+                    const t = 1 - Math.sqrt(dsq) / CFG.proximity;
+                    fillStyle = `rgb(${Math.round(BASE.r+(ACTIVE.r-BASE.r)*t)},${Math.round(BASE.g+(ACTIVE.g-BASE.g)*t)},${Math.round(BASE.b+(ACTIVE.b-BASE.b)*t)})`;
+                } else { fillStyle = `rgb(${BASE.r},${BASE.g},${BASE.b})`; }
+                ctx.beginPath(); ctx.arc(ox, oy, CFG.dotSize / 2, 0, Math.PI * 2);
+                ctx.fillStyle = fillStyle; ctx.fill();
             }
-        `;
-
-        const fragmentShader = `
-            varying vec2 vUv;
-            varying vec3 vPosition;
-
-            uniform float uTime;
-            uniform vec3  uColor;
-            uniform float uSpeed;
-            uniform float uScale;
-            uniform float uRotation;
-            uniform float uNoiseIntensity;
-
-            const float e = 2.71828182845904523536;
-
-            float noise(vec2 texCoord) {
-                float G = e;
-                vec2  r = (G * sin(G * texCoord));
-                return fract(r.x * r.y * (1.0 + texCoord.x));
-            }
-
-            vec2 rotateUvs(vec2 uv, float angle) {
-                float c = cos(angle);
-                float s = sin(angle);
-                mat2  rot = mat2(c, -s, s, c);
-                return rot * uv;
-            }
-
-            void main() {
-                float rnd     = noise(gl_FragCoord.xy);
-                vec2  uv      = rotateUvs(vUv * uScale, uRotation);
-                vec2  tex     = uv * uScale;
-                float tOffset = uSpeed * uTime;
-
-                tex.y += 0.03 * sin(8.0 * tex.x - tOffset);
-
-                float pattern = 0.6 +
-                    0.4 * sin(5.0 * (tex.x + tex.y +
-                        cos(3.0 * tex.x + 5.0 * tex.y) +
-                        0.02 * tOffset) +
-                        sin(20.0 * (tex.x + tex.y - 0.1 * tOffset)));
-
-                vec4 col = vec4(uColor, 1.0) * vec4(pattern) - rnd / 15.0 * uNoiseIntensity;
-                col.a = 1.0;
-                gl_FragColor = col;
-            }
-        `;
-
-        const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });
-        scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
-
-        let lastTime = performance.now();
-        function animate(now) {
-            requestAnimationFrame(animate);
-            const delta = Math.min((now - lastTime) / 1000, 0.05);
-            lastTime = now;
-            uniforms.uTime.value += 0.1 * delta;
-            renderer.render(scene, camera);
+            requestAnimationFrame(draw);
         }
-        requestAnimationFrame(animate);
-
-        window.addEventListener('resize', function () {
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        buildGrid(); requestAnimationFrame(draw);
+        function throttle(fn, ms) { let last = 0; return function(...args) { const now = performance.now(); if (now - last >= ms) { last = now; fn.apply(this, args); } }; }
+        window.addEventListener('mousemove', throttle(function(e) {
+            const now = performance.now(), pr = pointer, dt = pr.lastTime ? now - pr.lastTime : 16;
+            const dx = e.clientX - pr.lastX, dy = e.clientY - pr.lastY;
+            let vx = dx / dt * 1000, vy = dy / dt * 1000, speed = Math.hypot(vx, vy);
+            if (speed > 5000) { const s = 5000 / speed; vx *= s; vy *= s; speed = 5000; }
+            pr.lastTime = now; pr.lastX = e.clientX; pr.lastY = e.clientY;
+            pr.vx = vx; pr.vy = vy; pr.speed = speed; pr.x = e.clientX; pr.y = e.clientY;
+            if (speed > CFG.speedTrigger) {
+                for (const dot of dots) {
+                    const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
+                    if (dist < CFG.proximity) {
+                        const angle = Math.atan2(dot.cy - pr.y, dot.cx - pr.x), force = (1 - dist / CFG.proximity) * speed * 0.003;
+                        dot.vx += Math.cos(angle) * force; dot.vy += Math.sin(angle) * force;
+                    }
+                }
+            }
+        }, 16), { passive: true });
+        window.addEventListener('click', function(e) {
+            for (const dot of dots) {
+                const dist = Math.hypot(dot.cx - e.clientX, dot.cy - e.clientY);
+                if (dist < CFG.shockRadius) {
+                    const falloff = 1 - dist / CFG.shockRadius, angle = Math.atan2(dot.cy - e.clientY, dot.cx - e.clientX);
+                    dot.vx += Math.cos(angle) * CFG.shockStrength * falloff * 300;
+                    dot.vy += Math.sin(angle) * CFG.shockStrength * falloff * 300;
+                }
+            }
         });
+        window.addEventListener('resize', buildGrid);
     })();
 
     document.querySelectorAll('.learn-card').forEach(card => {
