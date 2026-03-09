@@ -226,6 +226,13 @@ body.home-page .hero {
     font-size: 18px;
     color: #fff;
     margin-bottom: 32px;
+    background: rgba(13, 11, 20, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(82, 39, 255, 0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .contact-bar {
